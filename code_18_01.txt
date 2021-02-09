@@ -1,12 +1,18 @@
-let cvs, ctx;
-let xPosBeg, yPosBeg; //beginning position of tank
-let bodyTank;   //body of tank
-let tower;  //tower of tank
-let shell, enemy;  //снаряд и танк врага
+var cvs;
+var ctx;
+var xPosBeg;
+var yPosBeg;
+var bodyTank;
+var tower;
+var shell;
+var enemy;
+//var Enemies = [];
+var counter = 0;
+var result = 0;
 
 window.onload = startGame;
 
-let xSh = 0, ySh = 0;  //rotation change of shell
+var xSh = 0, ySh = 0;  //position of shell
 
 document.addEventListener("keydown", function(e) { keyDown(e);});
 
@@ -36,6 +42,7 @@ class Component{
             this.yPosDel = this.yPos + yPosShell;
         }
         ctx.restore();
+        //else ctx.drawImage(this.image, this.xPos, this.yPos);
     }
 
     calcAngle (posMouse){
@@ -60,10 +67,14 @@ class ComponentShell extends Component{
         this.yPosDel = 0;
     }
     crashEnemy(otherObj){ //столкновение
+        //40x29
         let leftPos = otherObj.xPos;
         let rightPos = leftPos + 100;
         let topPos = otherObj.yPos;
         let bottomPos = topPos + 100;
+
+        //console.log(this.angRotate + Math.PI/4);
+        //console.log(this.xPosDel, this.yPosDel);
         if (this.xPosDel > leftPos && this.xPosDel < rightPos && this.yPosDel < bottomPos && this.yPosDel > topPos ){
             console.log ("crash");
             return true;
@@ -114,14 +125,28 @@ function draw(){
 
     ctx.clearRect(0, 0 , cvs.width, cvs.height); //clearing of canvas
 
+    /*if (counter == 0 || counter % 500 == 0){
+        let max = 4;
+        let rand = Math.floor(Math.random() * Math.floor(max)); //0, 1, 2, 3
+        Enemies.push(new ComponentEnemy(0, rand * 40, "img/enemy.png", 'enemy', 2))
+    }
+    for (let i = 0; i < Enemies.length; i++){
+        Enemies[i].updateEnemy();
+    }*/
+
     bodyTank.update();
     xSh += 6;
     ySh -= 6;
 
-    shell.update(xSh + 17, ySh + 36); //changing of position of shell
+    shell.update(xSh + 17, ySh + 36);
     
     tower.update(6, -7);  //correcting center of tower
 
+    /*for (let i = 0; i < Enemies.length; i++){
+        if (shell.crashEnemy(Enemies[i])){ 
+            console.log("+ 1");
+        }
+    }*/
     enemy.updateEnemy();
     if (shell.crashEnemy(enemy)){
         console.log("+ 1");
@@ -130,12 +155,20 @@ function draw(){
         enemy.xPos = 0;
     }
 
-    requestAnimationFrame(draw); //redrawing
+    counter++;
+    requestAnimationFrame(draw);
 }
 
 function keyDown(e){
     switch (e.keyCode){
-        case 87: // w
+        case 65:
+            //bodyTank.angRotate -= Math.PI / 180;
+            // console.log(bodyTank.angRotate);
+            break;
+        case 68:
+            //bodyTank.angRotate += Math.PI / 180; 
+            break;
+        case 87: // 
             bodyTank.yPos -= 2;
             tower.yPos -= 2;
             shell.yPos -= 2;
